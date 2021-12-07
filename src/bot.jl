@@ -11,7 +11,7 @@ Run telegram bot, which executes function `f` repeatedly.
 - `brute_force_alive`: despite all measures, messages sometimes "hangs". You may use this argument to wake up telegram server regularly. When this option is set to `true` it works, but it is not recommended, since it makes additional calls. Consider this feature experimental and use at your own risk.
 - `offset`: telegram message offset, useful if you have processed messages, but bot was interrupted and messages state was lost.
 """
-function run_bot(f, tg::TelegramClient = DEFAULT_OPTS.client; timeout = 20, brute_force_alive = false, offset = -1)
+function run_bot(f, tg::TelegramClient = DEFAULT_OPTS.client; timeout = 20, brute_force_alive = false, offset = -1,ignore_errors=false)
     if brute_force_alive
         @async while true
             try
@@ -26,7 +26,7 @@ function run_bot(f, tg::TelegramClient = DEFAULT_OPTS.client; timeout = 20, brut
     while true
         try
             ignore_errors = true
-            res = offset == -1 ? getUpdates(tg, timeout = timeout) : (ignore_errors = false;getUpdates(tg, timeout = timeout, offset = offset) )
+            res = offset == -1 ? getUpdates(tg, timeout = timeout) : (ignore_errors = ignore_errors;getUpdates(tg, timeout = timeout, offset = offset) )
             for msg in res
                 try
                     f(msg)
